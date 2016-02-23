@@ -19,12 +19,13 @@ def getFullPath(dirName, makeDir=False):
                 sys.exit(2)
     return dirName
 
-def latexDiff(oldFile, newFile, outFile):
-    diffCmd = ' '.join(['latexdiff', oldFile, newFile, '>', outFile])
+def latexDiff(oldFile, newFile, outFile, diffMath):
+    mathCmd = '' if diffMath else '--math-markup=0'
+    diffCmd = ' '.join(['latexdiff', mathCmd, oldFile, newFile, '>', outFile])
     print diffCmd
     os.system(diffCmd)
 
-def diffDir(prevDir, newDir, outDir):
+def diffDir(prevDir, newDir, outDir, diffMath):
     def getSubDir(dirName):
         return '/'.join(dirName.split('/')[1:])
     for folder, subs, files in os.walk(prevDir):
@@ -36,15 +37,17 @@ def diffDir(prevDir, newDir, outDir):
                 new = getFullPath(os.path.join(newDir, subDir))
                 out = getFullPath(os.path.join(outDir, subDir), True)
                 latexDiff(os.path.join(prev, f), os.path.join(new, f)
-                    , os.path.join(out, f))
+                    , os.path.join(out, f), diffMath)
 
 def main(argv):
     prevDir = ''
     newDir = ''
     outDir = ''
+    math = False
 
     # Get directories from the command line.
-    usage = 'diff.py -p <old directory> -n <new directory> -o <output directory>'
+    usage = 'diff.py -p <old directory> -n <new directory> -o " \
+        "<output directory> [-m]'
     try:
         opts, args = getopt.getopt(argv, "hp:n:o:"
             , ["previous=", "new=", "out="])
@@ -69,8 +72,10 @@ def main(argv):
             newDir = getFullPath(arg)
         elif opt in ('-o', '--out'):
             outDir = getFullPath(arg, True)
+        elif opt in ('-m', '--math'):
+            math = True
 
-    diffDir(prevDir, newDir, outDir)
+    diffDir(prevDir, newDir, outDir, math)
 
 if __name__=="__main__":
     main(sys.argv[1:])
