@@ -21,6 +21,7 @@ def getFullPath(dirName, makeDir=False):
 
 def latexDiff(oldFile, newFile, outFile):
     diffCmd = ' '.join(['latexdiff', oldFile, newFile, '>', outFile])
+    print diffCmd
     os.system(diffCmd)
 
 def diffDir(prevDir, newDir, outDir):
@@ -67,7 +68,7 @@ def main(argv):
         elif opt in ('-n', '--new'):
             newDir = getFullPath(arg)
         elif opt in ('-o', '--out'):
-            outDir = getFullPath(arg)
+            outDir = getFullPath(arg, True)
 
     diffDir(prevDir, newDir, outDir)
 
